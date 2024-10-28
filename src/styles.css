@@ -1,0 +1,968 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+body {
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    transition: background-color 0.3s, color 0.3s;
+    padding: 2rem;
+}
+
+.container {
+    max-width: 95%; /* For mobile/smaller screens */
+    width: 60%; /* Default width for larger screens */
+    margin: 0 auto;
+}
+
+/* Add media query for smaller screens */
+@media (max-width: 1024px) {
+    .container {
+        width: 95%; /* Use more width on smaller screens */
+    }
+}
+
+h1 {
+    color: var(--text-color);
+    margin-bottom: 2rem;
+    text-align: center;
+}
+
+.input-section {
+    background: var(--card-bg);
+    padding: 1.5rem;
+    border-radius: 10px;
+    box-shadow: var(--shadow);
+    margin-bottom: 2rem;
+    width: 100%; /* Ensure full width */
+}
+
+textarea {
+    width: 100%;
+    min-height: 100px;
+    padding: 1rem;
+    border: 1px solid #e1e1e1;
+    border-radius: 5px;
+    margin-bottom: 1rem;
+    resize: vertical;
+    font-size: 1rem;
+}
+
+button {
+    background-color: #3498db;
+    color: white;
+    border: none;
+    padding: 0.8rem 1.5rem;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 1rem;
+    transition: background-color 0.3s;
+}
+
+button:hover {
+    background-color: #2980b9;
+}
+
+.notes-container {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    padding: 0; /* Remove the padding */
+}
+
+.note {
+    background: var(--card-bg);
+    color: var(--text-color);
+    padding: 0; /* Remove all padding */
+    border-radius: 10px;
+    box-shadow: var(--shadow);
+    cursor: move;
+    position: relative;
+    transition: transform 0.3s, box-shadow 0.3s;
+    display: flex;
+    gap: 1rem;
+    margin: 0; /* Ensure no margins */
+    width: 100%; /* Ensure full width */
+    padding-right: 0; /* Remove right padding to allow buttons to sit flush */
+    min-height: 100px; /* Base minimum height */
+}
+
+.note:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+}
+
+.note.dragging {
+    opacity: 0.5;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+}
+
+.note-content-wrapper {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    padding: 1rem; /* Original padding */
+    padding-left: 2rem; /* Double the left padding */
+    padding-right: 0; /* Keep right padding at 0 for flush buttons */
+    margin: 0; /* Ensure no margins */
+}
+
+.note-content {
+    width: 100%;
+    order: 2;
+    line-height: 1.5; /* Improve text readability */
+}
+
+.tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem; /* Slightly increase gap between tags */
+    order: 1;
+    opacity: 0.8; /* Make tags slightly more subtle */
+}
+
+.tag {
+    display: inline-block;
+    padding: 0.3rem 0.8rem; /* Slightly adjust padding */
+    border-radius: 12px;
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    font-size: 0.75rem; /* Make tags slightly smaller */
+    font-weight: 500;
+    letter-spacing: 0.02em; /* Improve tag text readability */
+}
+
+.note-actions {
+    display: flex;
+    flex-direction: column;
+    height: auto; /* Let it fill naturally */
+    align-self: stretch; /* Force full height */
+    margin-left: auto; /* Push to right side */
+}
+
+.note-actions button {
+    flex: 1; /* Make buttons fill equal height */
+    width: 40px;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: none; /* Remove the border */
+}
+
+/* Add border radius only to outer corners */
+.note-actions button:first-child {
+    border-top-right-radius: 10px;
+}
+
+.note-actions button:last-child {
+    border-bottom-right-radius: 10px;
+}
+
+.note-actions button svg {
+    width: 20px;
+    height: 20px;
+    stroke: var(--text-color);
+    stroke-width: 2;
+    transition: stroke 0.3s;
+}
+
+.note-actions .edit-btn:hover svg {
+    stroke: white; /* Change from #2ecc71 to white */
+}
+
+.note-actions .delete-btn:hover svg {
+    stroke: #e74c3c;
+}
+
+.delete-btn {
+    background-color: #e74c3c;
+}
+
+.delete-btn:hover {
+    background-color: #e74c3c !important;
+    color: white !important;
+}
+
+.delete-btn:hover svg {
+    stroke: white !important;
+}
+
+.edit-btn {
+    background-color: #2ecc71;
+}
+
+.edit-btn:hover {
+    background-color: #27ae60;
+}
+
+/* Theme Variables */
+:root[data-theme="light"] {
+    --bg-color: #f5f6fa;
+    --text-color: #2c3e50;
+    --card-bg: white;
+    --shadow: rgba(0,0,0,0.1);
+}
+
+:root[data-theme="dark"] {
+    --bg-color: #1a1a1a;
+    --text-color: #ffffff;
+    --card-bg: #2d2d2d;
+    --shadow: rgba(0,0,0,0.3);
+}
+
+/* New components */
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center; /* Ensures vertical centering */
+    margin-bottom: 2rem;
+}
+
+.theme-toggle {
+    background: none !important;
+    border: none;
+    cursor: pointer;
+    padding: 0.5rem;  /* Match padding of other header buttons */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.theme-toggle:hover {
+    background: none !important;
+}
+
+.theme-toggle svg {
+    width: 24px;  /* Match size of other header icons */
+    height: 24px;
+    stroke: var(--text-color);
+    transition: transform 0.3s ease;
+}
+
+.theme-toggle:hover svg {
+    transform: scale(1.1);  /* Match hover effect of other buttons */
+}
+
+/* Important: These rules control icon visibility */
+.sun-icon, .moon-icon {
+    position: absolute;
+    transition: opacity 0.3s ease;
+}
+
+[data-theme='light'] .moon-icon {
+    opacity: 0;
+}
+
+[data-theme='light'] .sun-icon {
+    opacity: 1;
+}
+
+[data-theme='dark'] .sun-icon {
+    opacity: 0;
+}
+
+[data-theme='dark'] .moon-icon {
+    opacity: 1;
+}
+
+.search-section {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+
+.search-section input,
+.search-section select {
+    padding: 0.8rem;
+    border: 1px solid #e1e1e1;
+    border-radius: 5px;
+    font-size: 1rem;
+}
+
+.search-section input {
+    flex: 1;
+}
+
+.note-controls {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+    justify-content: flex-end; /* Aligns items to the right */
+}
+
+#charCount {
+    color: #666;
+    font-size: 0.9rem;
+}
+
+.tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.3rem;
+    margin-bottom: 0.5rem;
+}
+
+.tag {
+    display: inline-block;
+    padding: 0.2rem 0.8rem;
+    border-radius: 12px;
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    font-size: 0.8rem;
+    font-weight: 500;
+}
+
+/* If you want different colors for dark mode, you can add: */
+[data-theme='dark'] .tag {
+    background-color: #404040;
+    color: var(--text-color);
+}
+
+/* Add more styles as needed */
+
+.color-band {
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 6px;
+    border-top-left-radius: 10px;
+    border-bottom-left-radius: 10px;
+}
+
+/* Update input styles for consistency */
+.note-controls input[type="text"],
+.note-controls input[type="color"] {
+    padding: 0.8rem;
+    border: 1px solid #e1e1e1;
+    border-radius: 5px;
+    font-size: 1rem;
+}
+
+.note-controls input[type="color"] {
+    padding: 0;  /* Remove padding */
+    width: 48px; /* Make it square */
+    height: 48px;
+    cursor: pointer;
+    -webkit-appearance: none;
+    appearance: none;
+    overflow: hidden;
+}
+
+.note-controls input[type="color"]::-webkit-color-swatch-wrapper {
+    padding: 0;
+}
+
+.note-controls input[type="color"]::-webkit-color-swatch {
+    border: none;
+    border-radius: 4px;
+}
+
+/* For Firefox */
+.note-controls input[type="color"]::-moz-color-swatch {
+    border: none;
+    border-radius: 4px;
+}
+
+#tagInput {
+    min-width: 200px; /* Give more space for tags */
+}
+
+/* Update button styles for monochromatic look */
+.note-actions button {
+    background-color: var(--card-bg);
+    color: var(--text-color);
+    border: none;
+    border-radius: 0; /* Reset border radius */
+}
+
+/* Only add border radius to the outer corners */
+.note-actions button:first-child {
+    border-top-right-radius: 10px;
+}
+
+.note-actions button:last-child {
+    border-bottom-right-radius: 10px;
+}
+
+.note-actions button svg {
+    width: 20px;
+    height: 20px;
+    stroke: var(--text-color);
+    stroke-width: 2;
+    transition: stroke 0.3s;
+}
+
+.note-actions .edit-btn:hover svg {
+    stroke: white; /* Change from #2ecc71 to white */
+}
+
+.note-actions .delete-btn:hover svg {
+    stroke: #e74c3c;
+}
+
+.delete-btn {
+    background-color: #e74c3c;
+}
+
+.delete-btn:hover {
+    background-color: #e74c3c !important;
+    color: white !important;
+}
+
+.delete-btn:hover svg {
+    stroke: white !important;
+}
+
+.edit-btn {
+    background-color: #2ecc71;
+}
+
+.edit-btn:hover {
+    background-color: #27ae60;
+}
+
+/* Add these new styles */
+.edit-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 1000;
+    justify-content: center;
+    align-items: center;
+}
+
+.edit-modal {
+    background: var(--card-bg);
+    padding: 2rem;
+    border-radius: 10px;
+    width: 90%;
+    max-width: 800px;
+    box-shadow: var(--shadow);
+}
+
+.edit-modal textarea {
+    width: 100%;
+    min-height: 200px;
+    margin-bottom: 1rem;
+}
+
+.edit-controls {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+
+.edit-controls input[type="text"] {
+    flex: 1;
+    padding: 0.8rem;
+    border: 1px solid #e1e1e1;
+    border-radius: 5px;
+    font-size: 1rem;
+}
+
+.edit-controls input[type="color"] {
+    width: 48px;
+    height: 48px;
+    padding: 0;
+    border: 1px solid #e1e1e1;
+    border-radius: 5px;
+    -webkit-appearance: none;
+    appearance: none;
+    cursor: pointer;
+    overflow: hidden;
+}
+
+.edit-controls input[type="color"]::-webkit-color-swatch-wrapper {
+    padding: 0;
+}
+
+.edit-controls input[type="color"]::-webkit-color-swatch {
+    border: none;
+    border-radius: 4px;
+}
+
+/* For Firefox */
+.edit-controls input[type="color"]::-moz-color-swatch {
+    border: none;
+    border-radius: 4px;
+}
+
+.edit-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.5rem;
+}
+
+.edit-actions button {
+    background: none;
+    border: 1px solid var(--text-color);
+    padding: 0.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    width: 40px;
+    height: 40px;
+}
+
+.edit-actions button svg {
+    width: 20px;
+    height: 20px;
+    stroke: var(--text-color);
+    stroke-width: 2;
+    transition: stroke 0.3s;
+}
+
+.cancel-btn {
+    background-color: var(--card-bg);
+    color: var(--text-color);
+    border: 1px solid var(--text-color);
+}
+
+.save-btn {
+    background-color: #2ecc71;
+    color: white;
+}
+
+.cancel-btn:hover {
+    background-color: #e74c3c !important;
+    border-color: #e74c3c !important;
+}
+
+.cancel-btn:hover svg {
+    stroke: white !important;
+}
+
+.save-btn:hover {
+    background-color: #2ecc71 !important;
+    border-color: #2ecc71 !important;
+}
+
+.save-btn:hover svg {
+    stroke: white !important;
+}
+
+.note-main {
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+    width: 100%;
+}
+
+#addNote {
+    background: none;
+    border: 1px solid var(--text-color);
+    padding: 0.8rem;
+    border-radius: 5px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 48px; /* Match the color picker size */
+    height: 48px;
+}
+
+#addNote svg {
+    stroke: var(--text-color);
+    transition: stroke 0.3s;
+}
+
+#addNote:hover {
+    background-color: var(--text-color);
+}
+
+#addNote:hover svg {
+    stroke: var(--card-bg);
+}
+
+/* Add these styles for dark mode inputs */
+[data-theme='dark'] textarea,
+[data-theme='dark'] input[type="text"],
+[data-theme='dark'] select {
+    background-color: #404040;
+    color: var(--text-color);
+    border-color: #505050;
+}
+
+.header h1 {
+    margin: 0; /* Remove margin when h1 is in header */
+}
+
+/* Update header styles */
+.header-controls {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+}
+
+.search-toggle {
+    background: none !important;
+    border: none;
+    cursor: pointer;
+    padding: 0.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.search-toggle:hover {
+    background: none !important;
+}
+
+.search-toggle svg {
+    width: 24px;
+    height: 24px;
+    stroke: var(--text-color);
+    transition: transform 0.3s ease;
+}
+
+.search-toggle:hover svg {
+    transform: scale(1.1);
+}
+
+/* Search Overlay Styles */
+.search-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 1000;
+    justify-content: center;
+    align-items: flex-start;
+    padding-top: 20vh;
+}
+
+.search-modal {
+    background: var(--card-bg);
+    padding: 2rem;
+    border-radius: 10px;
+    width: 90%;
+    max-width: 600px;
+    box-shadow: var(--shadow);
+    position: relative;
+}
+
+.search-controls {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+
+.search-controls input,
+.search-controls select {
+    padding: 0.8rem;
+    border: 1px solid #e1e1e1;
+    border-radius: 5px;
+    font-size: 1rem;
+}
+
+.search-controls input {
+    flex: 1;
+}
+
+/* Remove the close-search button styles */
+.close-search {
+    display: none;
+}
+
+/* Add styles for active filters */
+.active-filters {
+    display: none; /* Hidden by default */
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+    flex-wrap: wrap;
+}
+
+.active-filters.visible {
+    display: flex;
+}
+
+.filter-tag {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: var(--card-bg);
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    font-size: 0.9rem;
+    box-shadow: var(--shadow);
+}
+
+.filter-tag button {
+    background: none;
+    border: none;
+    padding: 0;
+    width: 20px;
+    height: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+}
+
+.filter-tag button svg {
+    width: 16px;
+    height: 16px;
+    stroke: var(--text-color);
+}
+
+.filter-tag button:hover svg {
+    stroke: #e74c3c;
+}
+
+/* Remove the old search-section styles */
+.search-section {
+    display: none;
+}
+
+/* Add styles for add note button in header */
+.add-note-toggle {
+    background: none !important;
+    border: none;
+    cursor: pointer;
+    padding: 0.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.add-note-toggle:hover {
+    background: none !important;
+}
+
+.add-note-toggle svg {
+    width: 24px;
+    height: 24px;
+    stroke: var(--text-color);
+    transition: transform 0.3s ease;
+}
+
+.add-note-toggle:hover svg {
+    transform: scale(1.1);
+}
+
+/* Add note overlay styles */
+.add-note-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 1000;
+    justify-content: center;
+    align-items: flex-start;
+    padding-top: 20vh;
+    user-select: none; /* Prevent text selection */
+}
+
+.add-note-modal {
+    background: var(--card-bg);
+    padding: 2rem;
+    border-radius: 10px;
+    width: 90%;
+    max-width: 600px;
+    box-shadow: var(--shadow);
+    position: relative;
+    user-select: text; /* Re-enable text selection inside the modal */
+}
+
+.add-note-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.5rem;
+    margin-top: 1rem;
+}
+
+/* Remove the input-section styles or keep them as base styles for the modal */
+
+/* Common styles for all header buttons */
+.header-controls button {
+    background: none !important;
+    border: none;
+    cursor: pointer;
+    padding: 0.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;  /* Fixed width */
+    height: 40px; /* Fixed height */
+}
+
+.header-controls button:hover {
+    background: none !important;
+}
+
+.header-controls button svg {
+    width: 24px;
+    height: 24px;
+    stroke: var(--text-color);
+    transition: transform 0.3s ease;
+}
+
+.header-controls button:hover svg {
+    transform: scale(1.1);
+}
+
+/* Header layout */
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+}
+
+.header-controls {
+    display: flex;
+    gap: 0.5rem;  /* Consistent spacing between buttons */
+    align-items: center;
+}
+
+/* Hide the unused icon */
+.theme-toggle .moon-icon {
+    display: none;
+}
+
+[data-theme='dark'] .theme-toggle .sun-icon {
+    display: none;
+}
+
+[data-theme='dark'] .theme-toggle .moon-icon {
+    display: block;
+}
+
+.note-input-wrapper {
+    position: relative;
+    margin-bottom: 1rem;
+}
+
+.note-input-wrapper textarea {
+    width: 100%;
+    min-height: 200px;
+    padding: 1rem;  /* Remove the extra bottom padding */
+    border: 1px solid #e1e1e1;
+    border-radius: 5px;
+    resize: vertical;
+    font-size: 1rem;
+}
+
+.note-controls {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+}
+
+.note-controls input[type="text"] {
+    flex: 1;
+    padding: 0.8rem;
+    border: 1px solid #e1e1e1;
+    border-radius: 5px;
+    font-size: 1rem;
+}
+
+.note-controls input[type="color"] {
+    padding: 0;
+    width: 48px;
+    height: 48px;
+    border: 1px solid #e1e1e1;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.note-controls .save-btn {
+    width: 48px;
+    height: 48px;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #2ecc71;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.note-controls .save-btn svg {
+    width: 24px;
+    height: 24px;
+    stroke: white;
+}
+
+.note-controls .save-btn:hover {
+    background-color: #27ae60;
+}
+
+/* Add this new class for notes being shifted */
+.note.shifting {
+    transition: transform 0.3s ease-in-out;
+}
+
+/* Add these styles for the toast notification */
+.toast-container {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    z-index: 1000;
+}
+
+.toast {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background: var(--card-bg);
+    color: var(--text-color);
+    padding: 12px 16px;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    opacity: 0;
+    transform: translateY(100%);
+    transition: all 0.3s ease;
+}
+
+.toast.show {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.toast.fade {
+    opacity: 0;
+    transform: translateY(10px);
+}
+
+.toast .undo-btn {
+    background: none;
+    border: none;
+    padding: 0; /* Reduce padding */
+    width: 20px; /* Set explicit width */
+    height: 20px; /* Set explicit height */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+}
+
+.toast .undo-btn svg {
+    width: 24px;
+    height: 24px;
+    fill: var(--text-color);
+    transition: transform 0.2s ease;
+}
+
+.toast .undo-btn:hover svg {
+    transform: scale(1.1);
+}
